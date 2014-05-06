@@ -25,13 +25,6 @@ public class JobshopScheduling {
 	private static int lastJobId;
 	private static List<Machine> machines;
 	private static List<Job> jobs;
-	private static int[][] data = new int[][] {
-			{ 2, 1, 0, 3, 1, 6, 3, 7, 5, 3, 4, 6 },
-			{ 1, 8, 2, 5, 4, 10, 5, 10, 0, 10, 3, 4 },
-			{ 2, 5, 3, 4, 5, 8, 0, 9, 1, 1, 4, 7 },
-			{ 1, 5, 0, 5, 2, 5, 3, 3, 4, 8, 5, 9 },
-			{ 2, 9, 1, 3, 4, 5, 5, 4, 0, 3, 3, 1 },
-			{ 1, 3, 3, 3, 5, 9, 0, 10, 4, 4, 2, 1 }, { 6, 2, 7, 3 } };
 	private static Store store;
 	private static List<Job> prevJobs;
 	private static ArrayList<IntVar> vars = new ArrayList<IntVar>();
@@ -44,10 +37,8 @@ public class JobshopScheduling {
 		store = new Store();
 
 		machines = new ArrayList<Machine>();
-		// Machine[] machines = new Machine[8];
 
 		for (int i = 0; i < MACHINES_NUMBER; i++) {
-			// machines[i] = new Machine(i);
 			machines.add(new Machine(i));
 		}
 		jobs = new ArrayList<JobshopScheduling.Job>();
@@ -60,66 +51,25 @@ public class JobshopScheduling {
 	}
 
 	private static void jobshopScheduling() {
-
-		// Job[] jobs = new Job[data.length];
-
-		// not random
-		// for (int job = 0; job < data.length; job++) {
-		// jobs.add(new Job(job));
-		// //jobs[job] = new Job(job);
-		// int[] row = data[job];
-		//
-		// for (int i = 0; i < row.length; i += 2) {
-		// Machine m = machines.get(row[i]);
-		// //Machine m = machines[row[i]];
-		// int duration = row[i + 1];
-		// //jobs[job].addTask(m, duration, (i / 2) + 1);
-		// jobs.get(job).addTask(m, duration, (i / 2) + 1);
-		// }
-		// jobs.get(job).setConstraints();
-		// //jobs[job].setConstraints();
-		// }
 		Random rand = new Random();
 		int numOfJobs = rand.nextInt(MACHINES_NUMBER) + 1;
 		for (int id = lastJobId; id < numOfJobs + lastJobId; id++) {
-			// int id = lastJobId;
 			jobs.add(new Job(id));
-			// jobs[job] = new Job(job);
-			// int[] row = data[job];
-			// int numOfTasks = rand.nextInt(MACHINES_NUMBER)+1;
 			for (int i = 0; i < MACHINES_NUMBER; i++) {
 				Machine m = machines.get(i);
-				// Machine m = machines[row[i]];
 				int duration = 2;
-				// jobs[job].addTask(m, duration, (i / 2) + 1);
 				jobs.get(id - lastJobId).addTask(m, duration, i);
 			}
 			jobs.get(id - lastJobId).setConstraints();
-			// jobs[job].setConstraints();
 		}
 		lastJobId += numOfJobs;
 
 		if (prevJobs != null && !prevJobs.isEmpty()) {
 			jobs.addAll(prevJobs);
-			// for (Job job: prevJobs)
-			// {
-			// Job tmpJob = new Job(job.id-2);
-			//
-			// // jobs[job] = new Job(job);
-			// // int[] row = data[job];
-			// // int numOfTasks = rand.nextInt(MACHINES_NUMBER)+1;
-			// for (Task task: job.tasks) {
-			// tmpJob.addTask(task.m, task.duration, task.n);
-			// }
-			// tmpJob.setConstraints();
-			// jobs.add(tmpJob);
-			// // jobs[job].setConstraints();
-			// }
 		}
 
 		for (int i = 0; i < machines.size(); i++) {
 			machines.get(i).setConstraints();
-			// machines[i].setConstraints();
 		}
 
 		IntVar[] v = vars.toArray(new IntVar[0]);
@@ -138,15 +88,11 @@ public class JobshopScheduling {
 		SelectChoicePoint<IntVar> select = new SimpleSelect<IntVar>(v,
 				new SmallestDomain<IntVar>(), new IndomainMin<IntVar>());
 
-		// search.setSolutionListener(new PrintOutListener<IntVar>());
 		boolean result = search.labeling(store, select, lastJob);
 
 		if (result) {
 			new Graph(machines, DELTA);
 			System.out.println("Solution:");
-//			for (int i = 0; i < jobs.size(); i++) {
-//				System.out.println(jobs.get(i));
-//			}
 			for (int i = 0; i < machines.size(); i++) {
 				machines.get(i).printTasks(DELTA);
 			}
@@ -163,10 +109,8 @@ public class JobshopScheduling {
 		store = new Store();
 
 		machines = new ArrayList<Machine>();
-		// Machine[] machines = new Machine[8];
 
 		for (int i = 0; i < MACHINES_NUMBER; i++) {
-			// machines[i] = new Machine(i);
 			machines.add(new Machine(i));
 		}
 
@@ -190,18 +134,6 @@ public class JobshopScheduling {
 		if (it < 5) {
 			jobshopScheduling();
 		}
-
-		// for (Machine m: machines)
-		// {
-		// ArrayList<Task> tmpTasks = new ArrayList<Task>();
-		// for (Task task: tasks)
-		// {
-		// if (task.end.value() <= delta)
-		// {
-		// tmpTasks.add(task);
-		// }
-		// }
-		// }
 	}
 
 	static class Machine {
