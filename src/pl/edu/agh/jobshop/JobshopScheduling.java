@@ -27,6 +27,8 @@ public class JobshopScheduling {
 	private static List<Job> jobs;
 	private static Store store;
 	private static List<Job> prevJobs;
+	private static List<List<Machine>> generatedMachines;
+	private static List<List<Job>> generatedJobs;
 	private static ArrayList<IntVar> vars = new ArrayList<IntVar>();
 
 	public static void main(String[] args) {
@@ -53,16 +55,65 @@ public class JobshopScheduling {
 	private static void jobshopScheduling() {
 		Random rand = new Random();
 		int numOfJobs = rand.nextInt(MACHINES_NUMBER) + 1;
-		for (int id = lastJobId; id < numOfJobs + lastJobId; id++) {
-			jobs.add(new Job(id));
-			for (int i = 0; i < MACHINES_NUMBER; i++) {
-				Machine m = machines.get(i);
-				int duration = 2;
-				jobs.get(id - lastJobId).addTask(m, duration, i);
-			}
-			jobs.get(id - lastJobId).setConstraints();
+		if (generatedMachines == null)
+		{
+			boolean result = makeAllJob(numOfJobs, true);
+	
+			if (result) {
+				new Graph(machines, DELTA);
+				System.out.println("Solution:");
+				for (int i = 0; i < machines.size(); i++) {
+					machines.get(i).printTasks(DELTA);
+				}
+	
+				clearJobs(null);
+			} else
+				System.out.println("No solution");
 		}
-		lastJobId += numOfJobs;
+		else
+		{
+			machines = generatedMachines.get(numOfJobs-1);
+			lastJobId += numOfJobs;
+			new Graph(machines, DELTA);
+			System.out.println("Solution:");
+			for (int i = 0; i < machines.size(); i++) {
+				machines.get(i).printTasks(DELTA);
+			}
+
+			clearJobs(generatedJobs.get(numOfJobs-1));
+		}
+
+	}
+
+	private static boolean makeAllJob(int numOfJobs, boolean shouldChangeLastJobId) {
+//		if (shouldChangeLastJobId)
+//		{
+			for (int id = lastJobId; id < numOfJobs + lastJobId; id++) {
+				jobs.add(new Job(id));
+				for (int i = 0; i < MACHINES_NUMBER; i++) {
+					Machine m = machines.get(i);
+					int duration = 2;
+					jobs.get(id - lastJobId).addTask(m, duration, i);
+				}
+				jobs.get(id - lastJobId).setConstraints();
+			}
+			if (shouldChangeLastJobId)
+				lastJobId += numOfJobs;
+//		}
+//		else
+//		{
+//			int jobId = lastJobId;
+//			for (int id = jobId; id < numOfJobs + jobId; id++) {
+//				jobs.add(new Job(id));
+//				for (int i = 0; i < MACHINES_NUMBER; i++) {
+//					Machine m = machines.get(i);
+//					int duration = 2;
+//					jobs.get(id - jobId).addTask(m, duration, i);
+//				}
+//				jobs.get(id - jobId).setConstraints();
+//			}
+//			jobId += numOfJobs;
+//		}
 
 		if (prevJobs != null && !prevJobs.isEmpty()) {
 			jobs.addAll(prevJobs);
@@ -79,7 +130,7 @@ public class JobshopScheduling {
 			lastTimes[i] = jobs.get(i).getLastEndTime();
 		}
 
-		IntVar lastJob = new IntVar(store, "lastJob", 0, 100);
+		IntVar lastJob = new IntVar(store, "lastJob", 0, 10000);
 
 		store.impose(new Max(lastTimes, lastJob));
 
@@ -89,23 +140,15 @@ public class JobshopScheduling {
 				new SmallestDomain<IntVar>(), new IndomainMin<IntVar>());
 
 		boolean result = search.labeling(store, select, lastJob);
-
-		if (result) {
-			new Graph(machines, DELTA);
-			System.out.println("Solution:");
-			for (int i = 0; i < machines.size(); i++) {
-				machines.get(i).printTasks(DELTA);
-			}
-
-			clearJobs();
-
-			System.out.printf("\n\nLast job ends at %d\n", lastJob.value());
-		} else
-			System.out.println("No solution");
-
+		return result;
 	}
 
-	private static void clearJobs() {
+	private static void clearJobs(List<Job> js) {
+		List<Job> searchInJobs;
+		if (js != null)
+			searchInJobs = js;
+		else
+			searchInJobs = jobs;
 		store = new Store();
 
 		machines = new ArrayList<Machine>();
@@ -113,9 +156,8 @@ public class JobshopScheduling {
 		for (int i = 0; i < MACHINES_NUMBER; i++) {
 			machines.add(new Machine(i));
 		}
-
 		prevJobs = new ArrayList<Job>();
-		for (Job job : jobs) {
+		for (Job job : searchInJobs) {
 			Job tmpJob = new Job(job.id - 1);
 			for (Task task : job.tasks) {
 				if (task.end.value() > DELTA) {
@@ -129,13 +171,61 @@ public class JobshopScheduling {
 			}
 		}
 		jobs = new ArrayList<JobshopScheduling.Job>();
+		vars = new ArrayList<IntVar>();
 
 		it++;
 		if (it < 5) {
+			runWorkers();
 			jobshopScheduling();
 		}
 	}
 
+	private static void runWorkers()
+	{
+		generatedMachines = new ArrayList<List<Machine>>();
+		generatedJobs = new ArrayList<List<Job>>();
+		for (int numOfJobs=1; numOfJobs<=MACHINES_NUMBER; numOfJobs++)
+		{
+			boolean result = makeAllJob(numOfJobs, false);
+			if (result)
+			{
+				generatedMachines.add(machines);
+				generatedJobs.add(jobs);
+				//new Graph(machines, DELTA);
+//				System.out.println("WORK!!!Solution");
+//				for (int i = 0; i < machines.size(); i++) {
+//					machines.get(i).printTasks(DELTA);
+//				}
+				
+			}
+			store = new Store();
+
+			machines = new ArrayList<Machine>();
+
+			for (int i = 0; i < MACHINES_NUMBER; i++) {
+				machines.add(new Machine(i));
+			}
+			
+			List<Job> tmpPrevJobs = new ArrayList<JobshopScheduling.Job>();
+			tmpPrevJobs.addAll(prevJobs);
+			
+			prevJobs = new ArrayList<Job>();
+			for (Job job : tmpPrevJobs) {
+				Job tmpJob = new Job(job.id - 1);
+				for (Task task : job.tasks) {
+						tmpJob.addTask(machines.get(task.m.n), task.duration,
+								task.n);
+				}
+				if (!tmpJob.tasks.isEmpty()) {
+					tmpJob.setConstraints();
+					prevJobs.add(tmpJob);
+				}
+			}
+			jobs = new ArrayList<JobshopScheduling.Job>();
+			vars = new ArrayList<IntVar>();
+		}
+	}
+	
 	static class Machine {
 		int n;
 		ArrayList<Task> tasks = new ArrayList<Task>();
