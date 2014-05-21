@@ -22,6 +22,7 @@ public class JobshopScheduling {
 
 	private static int BIG_NUMBER = 1000;
 	private static final int MACHINES_NUMBER = 8;
+	private static final int JOBS_NUMBER = 3;
 	private static final int DELTA = 15;
 	private static int it = 0;
 	private static int lastJobId;
@@ -58,7 +59,7 @@ public class JobshopScheduling {
 		Random rand = new Random();
 		Map<Integer, Integer> numOfJobsPerMachine = new LinkedHashMap<Integer, Integer>();
 		for (int i = 0; i < MACHINES_NUMBER; i++) {
-			int numOfJobs = rand.nextInt(MACHINES_NUMBER) + 1;
+			int numOfJobs = rand.nextInt(JOBS_NUMBER) + 1;
 			numOfJobsPerMachine.put(i, numOfJobs);
 		}
 		if (generatedMachines == null) {
@@ -102,7 +103,7 @@ public class JobshopScheduling {
 	private static int getIdOfNumOfJobsPerMachine(
 			Map<Integer, Integer> numOfJobsPerMachine) {
 		int id = 0;
-		for (int i = MACHINES_NUMBER; i >= 0; i--) {
+		for (int i = (MACHINES_NUMBER - 1); i >= 0; i--) {
 			int tmp = 1;
 			for (int j = 0; j < i; j++) {
 				tmp *= 10;
@@ -115,18 +116,29 @@ public class JobshopScheduling {
 	private static boolean makeAllJob(
 			Map<Integer, Integer> numOfJobsPerMachine,
 			boolean shouldChangeLastJobId) {
+		int tmpLastId = 0;
+		if (!shouldChangeLastJobId)
+			tmpLastId = lastJobId;
 		for (int i = 0; i < MACHINES_NUMBER; i++) {
 			Machine m = machines.get(i);
 			int numOfJobs = numOfJobsPerMachine.get(i);
-			for (int id = lastJobId; id < numOfJobs + lastJobId; id++) {
-				jobs.add(new Job(id));
-				int duration = 2;
-				jobs.get(id - lastJobId).addTask(m, duration, i);
-				jobs.get(id - lastJobId).setConstraints();
+			for (int id = shouldChangeLastJobId ? lastJobId : tmpLastId; id < numOfJobs
+					+ (shouldChangeLastJobId ? lastJobId : tmpLastId); id++) {
+				int duration = 7;
+				Job tmpJob = new Job(id);
+				tmpJob.addTask(m, duration, 0);
+				tmpJob.setConstraints();
+				jobs.add(tmpJob);
+				// jobs.add(new Job(id));
+				// int duration = 2;
+				// jobs.get(id).addTask(m, duration, 0);
+				// jobs.get(id).setConstraints();
 			}
 
 			if (shouldChangeLastJobId)
 				lastJobId += numOfJobs;
+			else
+				tmpLastId += numOfJobs;
 		}
 
 		if (prevJobs != null && !prevJobs.isEmpty()) {
@@ -197,23 +209,23 @@ public class JobshopScheduling {
 	private static void runWorkers() {
 		generatedMachines = new LinkedHashMap<Integer, List<Machine>>();
 		generatedJobs = new LinkedHashMap<Integer, List<Job>>();
-		for (int numOfJobs0 = 1; numOfJobs0 <= MACHINES_NUMBER; numOfJobs0++)
-			for (int numOfJobs1 = 1; numOfJobs1 <= MACHINES_NUMBER; numOfJobs1++)
-				for (int numOfJobs2 = 1; numOfJobs2 <= MACHINES_NUMBER; numOfJobs2++)
-					for (int numOfJobs3 = 1; numOfJobs3 <= MACHINES_NUMBER; numOfJobs3++)
-						for (int numOfJobs4 = 1; numOfJobs4 <= MACHINES_NUMBER; numOfJobs4++)
-							for (int numOfJobs5 = 1; numOfJobs5 <= MACHINES_NUMBER; numOfJobs5++)
-								for (int numOfJobs6 = 1; numOfJobs6 <= MACHINES_NUMBER; numOfJobs6++)
-									for (int numOfJobs7 = 1; numOfJobs7 <= MACHINES_NUMBER; numOfJobs7++) {
+		for (int numOfJobs0 = 1; numOfJobs0 <= JOBS_NUMBER; numOfJobs0++)
+			for (int numOfJobs1 = 1; numOfJobs1 <= JOBS_NUMBER; numOfJobs1++)
+				for (int numOfJobs2 = 1; numOfJobs2 <= JOBS_NUMBER; numOfJobs2++)
+					for (int numOfJobs3 = 1; numOfJobs3 <= JOBS_NUMBER; numOfJobs3++)
+						for (int numOfJobs4 = 1; numOfJobs4 <= JOBS_NUMBER; numOfJobs4++)
+							for (int numOfJobs5 = 1; numOfJobs5 <= JOBS_NUMBER; numOfJobs5++)
+								for (int numOfJobs6 = 1; numOfJobs6 <= JOBS_NUMBER; numOfJobs6++)
+									for (int numOfJobs7 = 1; numOfJobs7 <= JOBS_NUMBER; numOfJobs7++) {
 										Map<Integer, Integer> numOfJobsPerMachine = new LinkedHashMap<Integer, Integer>();
 										numOfJobsPerMachine.put(0, numOfJobs0);
-										numOfJobsPerMachine.put(1, numOfJobs0);
-										numOfJobsPerMachine.put(2, numOfJobs0);
-										numOfJobsPerMachine.put(3, numOfJobs0);
-										numOfJobsPerMachine.put(4, numOfJobs0);
-										numOfJobsPerMachine.put(5, numOfJobs0);
-										numOfJobsPerMachine.put(6, numOfJobs0);
-										numOfJobsPerMachine.put(7, numOfJobs0);
+										numOfJobsPerMachine.put(1, numOfJobs1);
+										numOfJobsPerMachine.put(2, numOfJobs2);
+										numOfJobsPerMachine.put(3, numOfJobs3);
+										numOfJobsPerMachine.put(4, numOfJobs4);
+										numOfJobsPerMachine.put(5, numOfJobs5);
+										numOfJobsPerMachine.put(6, numOfJobs6);
+										numOfJobsPerMachine.put(7, numOfJobs7);
 										boolean result = makeAllJob(
 												numOfJobsPerMachine, false);
 										if (result) {
