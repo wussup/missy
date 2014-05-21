@@ -22,8 +22,8 @@ public class JobshopScheduling {
 
 	private static int BIG_NUMBER = 1000;
 	private static final int MACHINES_NUMBER = 8;
-	private static final int JOBS_NUMBER = 3;
-	private static final int DELTA = 5;
+	private static final int JOBS_NUMBER = 7;
+	private static final int DELTA = 15;
 	private static int it = 0;
 	private static int lastJobId;
 	private static List<Machine> machines;
@@ -83,7 +83,7 @@ public class JobshopScheduling {
 				id = getRandomIdOfNumOfJobsPerMachine();
 				machines = generatedMachines.get(id);
 			}
-			lastJobId += getSumOfNumOfJobsPerMachine(numOfJobsPerMachine);
+			lastJobId += MACHINES_NUMBER;
 			new Graph(machines, DELTA);
 			System.out.println("Solution:");
 			for (int i = 0; i < machines.size(); i++) {
@@ -94,7 +94,7 @@ public class JobshopScheduling {
 		}
 
 	}
-
+	
 	private static int getRandomIdOfNumOfJobsPerMachine() {
 		Random rand = new Random();
 		int iter = rand.nextInt(generatedMachines.keySet().size());
@@ -140,7 +140,7 @@ public class JobshopScheduling {
 			Machine m = machines.get(i);
 			int numOfTasks = numOfJobsPerMachine.get(i);
 			int id = shouldChangeLastJobId ? lastJobId : tmpLastId;
-			int duration = 2;
+			int duration = 4;
 			Job tmpJob = new Job(id);
 			for (int j = 0; j < numOfTasks; j++) {
 				tmpJob.addTask(m, duration, j);
