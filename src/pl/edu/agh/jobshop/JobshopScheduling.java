@@ -23,7 +23,7 @@ public class JobshopScheduling {
 	private static int BIG_NUMBER = 1000;
 	private static final int MACHINES_NUMBER = 8;
 	private static final int JOBS_NUMBER = 3;
-	private static final int DELTA = 15;
+	private static final int DELTA = 5;
 	private static int it = 0;
 	private static int lastJobId;
 	private static List<Machine> machines;
@@ -33,6 +33,7 @@ public class JobshopScheduling {
 	private static Map<Integer, List<Machine>> generatedMachines;
 	private static Map<Integer, List<Job>> generatedJobs;
 	private static ArrayList<IntVar> vars = new ArrayList<IntVar>();
+	private static boolean shouldWork;
 
 	public static void main(String[] args) {
 		long T1, T2, T;
@@ -76,8 +77,12 @@ public class JobshopScheduling {
 			} else
 				System.out.println("No solution");
 		} else {
-			machines = generatedMachines
-					.get(getIdOfNumOfJobsPerMachine(numOfJobsPerMachine));
+			int id = getIdOfNumOfJobsPerMachine(numOfJobsPerMachine);
+			machines = generatedMachines.get(id);
+			if (machines == null) {
+				id = getRandomIdOfNumOfJobsPerMachine();
+				machines = generatedMachines.get(id);
+			}
 			lastJobId += getSumOfNumOfJobsPerMachine(numOfJobsPerMachine);
 			new Graph(machines, DELTA);
 			System.out.println("Solution:");
@@ -85,10 +90,22 @@ public class JobshopScheduling {
 				machines.get(i).printTasks(DELTA);
 			}
 
-			clearJobs(generatedJobs
-					.get(getIdOfNumOfJobsPerMachine(numOfJobsPerMachine)));
+			clearJobs(generatedJobs.get(id));
 		}
 
+	}
+
+	private static int getRandomIdOfNumOfJobsPerMachine() {
+		Random rand = new Random();
+		int iter = rand.nextInt(generatedMachines.keySet().size());
+		int i = 0;
+
+		for (int id : generatedMachines.keySet()) {
+			if (iter == i)
+				return id;
+			i++;
+		}
+		return -1;
 	}
 
 	private static int getSumOfNumOfJobsPerMachine(
@@ -123,21 +140,17 @@ public class JobshopScheduling {
 			Machine m = machines.get(i);
 			int numOfTasks = numOfJobsPerMachine.get(i);
 			int id = shouldChangeLastJobId ? lastJobId : tmpLastId;
-			int duration = 7;
+			int duration = 2;
 			Job tmpJob = new Job(id);
 			for (int j = 0; j < numOfTasks; j++) {
 				tmpJob.addTask(m, duration, j);
-				// jobs.add(new Job(id));
-				// int duration = 2;
-				// jobs.get(id).addTask(m, duration, 0);
-				// jobs.get(id).setConstraints();
 			}
 			tmpJob.setConstraints();
 			jobs.add(tmpJob);
 			if (shouldChangeLastJobId)
-				lastJobId ++;
+				lastJobId++;
 			else
-				tmpLastId ++;
+				tmpLastId++;
 		}
 
 		if (prevJobs != null && !prevJobs.isEmpty()) {
@@ -206,62 +219,99 @@ public class JobshopScheduling {
 	}
 
 	private static void runWorkers() {
-		generatedMachines = new LinkedHashMap<Integer, List<Machine>>();
-		generatedJobs = new LinkedHashMap<Integer, List<Job>>();
-		for (int numOfJobs0 = 1; numOfJobs0 <= JOBS_NUMBER; numOfJobs0++)
-			for (int numOfJobs1 = 1; numOfJobs1 <= JOBS_NUMBER; numOfJobs1++)
-				for (int numOfJobs2 = 1; numOfJobs2 <= JOBS_NUMBER; numOfJobs2++)
-					for (int numOfJobs3 = 1; numOfJobs3 <= JOBS_NUMBER; numOfJobs3++)
-						for (int numOfJobs4 = 1; numOfJobs4 <= JOBS_NUMBER; numOfJobs4++)
-							for (int numOfJobs5 = 1; numOfJobs5 <= JOBS_NUMBER; numOfJobs5++)
-								for (int numOfJobs6 = 1; numOfJobs6 <= JOBS_NUMBER; numOfJobs6++)
-									for (int numOfJobs7 = 1; numOfJobs7 <= JOBS_NUMBER; numOfJobs7++) {
-										Map<Integer, Integer> numOfJobsPerMachine = new LinkedHashMap<Integer, Integer>();
-										numOfJobsPerMachine.put(0, numOfJobs0);
-										numOfJobsPerMachine.put(1, numOfJobs1);
-										numOfJobsPerMachine.put(2, numOfJobs2);
-										numOfJobsPerMachine.put(3, numOfJobs3);
-										numOfJobsPerMachine.put(4, numOfJobs4);
-										numOfJobsPerMachine.put(5, numOfJobs5);
-										numOfJobsPerMachine.put(6, numOfJobs6);
-										numOfJobsPerMachine.put(7, numOfJobs7);
-										boolean result = makeAllJob(
-												numOfJobsPerMachine, false);
-										if (result) {
-											generatedMachines
-													.put(getIdOfNumOfJobsPerMachine(numOfJobsPerMachine),
-															machines);
-											generatedJobs
-													.put(getIdOfNumOfJobsPerMachine(numOfJobsPerMachine),
-															jobs);
-										}
-										store = new Store();
+		setShouldWork(true);
+		Thread thread = new Thread(new Runnable() {
 
-										machines = new ArrayList<Machine>();
+			@Override
+			public void run() {
+				generatedMachines = new LinkedHashMap<Integer, List<Machine>>();
+				generatedJobs = new LinkedHashMap<Integer, List<Job>>();
+				for (int numOfJobs0 = 1; numOfJobs0 <= JOBS_NUMBER
+						&& isShouldWork(); numOfJobs0++)
+					for (int numOfJobs1 = 1; numOfJobs1 <= JOBS_NUMBER
+							&& isShouldWork(); numOfJobs1++)
+						for (int numOfJobs2 = 1; numOfJobs2 <= JOBS_NUMBER
+								&& isShouldWork(); numOfJobs2++)
+							for (int numOfJobs3 = 1; numOfJobs3 <= JOBS_NUMBER
+									&& isShouldWork(); numOfJobs3++)
+								for (int numOfJobs4 = 1; numOfJobs4 <= JOBS_NUMBER
+										&& isShouldWork(); numOfJobs4++)
+									for (int numOfJobs5 = 1; numOfJobs5 <= JOBS_NUMBER
+											&& isShouldWork(); numOfJobs5++)
+										for (int numOfJobs6 = 1; numOfJobs6 <= JOBS_NUMBER
+												&& isShouldWork(); numOfJobs6++)
+											for (int numOfJobs7 = 1; numOfJobs7 <= JOBS_NUMBER
+													&& isShouldWork(); numOfJobs7++) {
 
-										for (int i = 0; i < MACHINES_NUMBER; i++) {
-											machines.add(new Machine(i));
-										}
+												Map<Integer, Integer> numOfJobsPerMachine = new LinkedHashMap<Integer, Integer>();
+												numOfJobsPerMachine.put(0,
+														numOfJobs0);
+												numOfJobsPerMachine.put(1,
+														numOfJobs1);
+												numOfJobsPerMachine.put(2,
+														numOfJobs2);
+												numOfJobsPerMachine.put(3,
+														numOfJobs3);
+												numOfJobsPerMachine.put(4,
+														numOfJobs4);
+												numOfJobsPerMachine.put(5,
+														numOfJobs5);
+												numOfJobsPerMachine.put(6,
+														numOfJobs6);
+												numOfJobsPerMachine.put(7,
+														numOfJobs7);
+												boolean result = makeAllJob(
+														numOfJobsPerMachine,
+														false);
+												if (result) {
+													generatedMachines
+															.put(getIdOfNumOfJobsPerMachine(numOfJobsPerMachine),
+																	machines);
+													generatedJobs
+															.put(getIdOfNumOfJobsPerMachine(numOfJobsPerMachine),
+																	jobs);
+												}
+												store = new Store();
 
-										List<Job> tmpPrevJobs = new ArrayList<JobshopScheduling.Job>();
-										tmpPrevJobs.addAll(prevJobs);
+												machines = new ArrayList<Machine>();
 
-										prevJobs = new ArrayList<Job>();
-										for (Job job : tmpPrevJobs) {
-											Job tmpJob = new Job(job.id - 1);
-											for (Task task : job.tasks) {
-												tmpJob.addTask(
-														machines.get(task.m.n),
-														task.duration, task.n);
+												for (int i = 0; i < MACHINES_NUMBER; i++) {
+													machines.add(new Machine(i));
+												}
+
+												List<Job> tmpPrevJobs = new ArrayList<JobshopScheduling.Job>();
+												tmpPrevJobs.addAll(prevJobs);
+
+												prevJobs = new ArrayList<Job>();
+												for (Job job : tmpPrevJobs) {
+													Job tmpJob = new Job(
+															job.id - 1);
+													for (Task task : job.tasks) {
+														tmpJob.addTask(machines
+																.get(task.m.n),
+																task.duration,
+																task.n);
+													}
+													if (!tmpJob.tasks.isEmpty()) {
+														tmpJob.setConstraints();
+														prevJobs.add(tmpJob);
+													}
+												}
+												jobs = new ArrayList<JobshopScheduling.Job>();
+												vars = new ArrayList<IntVar>();
 											}
-											if (!tmpJob.tasks.isEmpty()) {
-												tmpJob.setConstraints();
-												prevJobs.add(tmpJob);
-											}
-										}
-										jobs = new ArrayList<JobshopScheduling.Job>();
-										vars = new ArrayList<IntVar>();
-									}
+
+			}
+		});
+		thread.start();
+		try {
+			Thread.sleep(DELTA * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		setShouldWork(false);
+		while (thread.isAlive())
+			;
 	}
 
 	static class Machine {
@@ -382,6 +432,14 @@ public class JobshopScheduling {
 		public IntVar[][] getRectangles() {
 			return rectangles.toArray(new IntVar[0][0]);
 		}
+	}
+
+	public synchronized static boolean isShouldWork() {
+		return shouldWork;
+	}
+
+	public synchronized static void setShouldWork(boolean shouldWork) {
+		JobshopScheduling.shouldWork = shouldWork;
 	}
 
 }
