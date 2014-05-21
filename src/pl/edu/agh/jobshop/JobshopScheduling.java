@@ -121,24 +121,23 @@ public class JobshopScheduling {
 			tmpLastId = lastJobId;
 		for (int i = 0; i < MACHINES_NUMBER; i++) {
 			Machine m = machines.get(i);
-			int numOfJobs = numOfJobsPerMachine.get(i);
-			for (int id = shouldChangeLastJobId ? lastJobId : tmpLastId; id < numOfJobs
-					+ (shouldChangeLastJobId ? lastJobId : tmpLastId); id++) {
-				int duration = 7;
-				Job tmpJob = new Job(id);
-				tmpJob.addTask(m, duration, 0);
-				tmpJob.setConstraints();
-				jobs.add(tmpJob);
+			int numOfTasks = numOfJobsPerMachine.get(i);
+			int id = shouldChangeLastJobId ? lastJobId : tmpLastId;
+			int duration = 7;
+			Job tmpJob = new Job(id);
+			for (int j = 0; j < numOfTasks; j++) {
+				tmpJob.addTask(m, duration, j);
 				// jobs.add(new Job(id));
 				// int duration = 2;
 				// jobs.get(id).addTask(m, duration, 0);
 				// jobs.get(id).setConstraints();
 			}
-
+			tmpJob.setConstraints();
+			jobs.add(tmpJob);
 			if (shouldChangeLastJobId)
-				lastJobId += numOfJobs;
+				lastJobId ++;
 			else
-				tmpLastId += numOfJobs;
+				tmpLastId ++;
 		}
 
 		if (prevJobs != null && !prevJobs.isEmpty()) {
