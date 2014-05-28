@@ -25,6 +25,7 @@ public class JobshopScheduling {
 	private static final int MACHINES_NUMBER = 8;
 	private static final int JOBS_NUMBER = 7;
 	private static final int DURATIONS_NUMBER = 3;
+	private static final int MIN_DURATION = 3;
 	private static final int DELTA = 15;
 	private static int it = 0;
 	private static int lastJobId;
@@ -65,7 +66,7 @@ public class JobshopScheduling {
 			int numOfJobs = rand.nextInt(JOBS_NUMBER) + 1;
 			List<Integer> durations = new ArrayList<Integer>();
 			for (int j = 0; j < numOfJobs; j++) {
-				durations.add(rand.nextInt(DURATIONS_NUMBER) + 3);
+				durations.add(rand.nextInt(DURATIONS_NUMBER) + MIN_DURATION);
 			}
 			numOfJobsPerMachine.put(i, durations);
 		}
@@ -209,10 +210,15 @@ public class JobshopScheduling {
 		prevJobs = new ArrayList<Job>();
 		for (Job job : searchInJobs) {
 			Job tmpJob = new Job(job.id - 1);
+			ArrayList<StartEnd> startEnds = new ArrayList<StartEnd>();
 			for (Task task : job.tasks) {
-				if (task.end.value() > DELTA) {
+				if (!(task.end.value() <= DELTA && checkStartEnds(startEnds,
+						task.start.value(), task.end.value()))) {
 					tmpJob.addTask(machines.get(task.m.n), task.duration,
 							task.n);
+				} else {
+					startEnds.add(new StartEnd(task.start.value(), task.end
+							.value()));
 				}
 			}
 			if (!tmpJob.tasks.isEmpty()) {
@@ -225,12 +231,12 @@ public class JobshopScheduling {
 
 		it++;
 		if (it < 5) {
-			runWorkers(it);
+			runWorkers();
 			jobshopScheduling();
 		}
 	}
 
-	private static void runWorkers(int iter) {
+	private static void runWorkers() {
 		setShouldWork(true);
 		Thread thread = new Thread(new Runnable() {
 
@@ -238,131 +244,158 @@ public class JobshopScheduling {
 			public void run() {
 				generatedMachines = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Machine>>();
 				generatedJobs = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Job>>();
-				for (int numOfJobs0 = 1; numOfJobs0 <= JOBS_NUMBER; numOfJobs0++)
-					for (int numOfJobs1 = 1; numOfJobs1 <= JOBS_NUMBER; numOfJobs1++)
-						for (int numOfJobs2 = 1; numOfJobs2 <= JOBS_NUMBER; numOfJobs2++)
-							for (int numOfJobs3 = 1; numOfJobs3 <= JOBS_NUMBER; numOfJobs3++)
-								for (int numOfJobs4 = 1; numOfJobs4 <= JOBS_NUMBER; numOfJobs4++)
-									for (int numOfJobs5 = 1; numOfJobs5 <= JOBS_NUMBER; numOfJobs5++)
-										for (int numOfJobs6 = 1; numOfJobs6 <= JOBS_NUMBER; numOfJobs6++)
-											for (int numOfJobs7 = 1; numOfJobs7 <= JOBS_NUMBER; numOfJobs7++) {
-												while (!isShouldWork())
-													try {
-														Thread.sleep(1000);
-													} catch (InterruptedException e) {
-														e.printStackTrace();
+				for (int numOfJobs0 = 1; numOfJobs0 <= JOBS_NUMBER
+						&& isShouldWork(); numOfJobs0++)
+					for (int numOfJobs1 = 1; numOfJobs1 <= JOBS_NUMBER
+							&& isShouldWork(); numOfJobs1++)
+						for (int numOfJobs2 = 1; numOfJobs2 <= JOBS_NUMBER
+								&& isShouldWork(); numOfJobs2++)
+							for (int numOfJobs3 = 1; numOfJobs3 <= JOBS_NUMBER
+									&& isShouldWork(); numOfJobs3++)
+								for (int numOfJobs4 = 1; numOfJobs4 <= JOBS_NUMBER
+										&& isShouldWork(); numOfJobs4++)
+									for (int numOfJobs5 = 1; numOfJobs5 <= JOBS_NUMBER
+											&& isShouldWork(); numOfJobs5++)
+										for (int numOfJobs6 = 1; numOfJobs6 <= JOBS_NUMBER
+												&& isShouldWork(); numOfJobs6++)
+											for (int numOfJobs7 = 1; numOfJobs7 <= JOBS_NUMBER
+													&& isShouldWork(); numOfJobs7++)
+												for (long worker = 0; worker < numOfJobs0
+														* numOfJobs1
+														* numOfJobs2
+														* numOfJobs3
+														* numOfJobs4
+														* numOfJobs5
+														* numOfJobs6
+														* numOfJobs7
+														&& shouldWork; worker++) {
+													Random rand = new Random();
+													boolean work = true;
+													ConcurrentHashMap<Integer, List<Integer>> numOfJobsPerMachine = new ConcurrentHashMap<Integer, List<Integer>>();
+													while (work) {
+														numOfJobsPerMachine = new ConcurrentHashMap<Integer, List<Integer>>();
+														List<Integer> list = new ArrayList<Integer>();
+														for (int k = 0; k < numOfJobs0; k++) {
+															list.add(rand
+																	.nextInt(DURATIONS_NUMBER)
+																	+ MIN_DURATION);
+														}
+														numOfJobsPerMachine
+																.put(0, list);
+														list = new ArrayList<Integer>();
+														for (int k = 0; k < numOfJobs1; k++) {
+															list.add(rand
+																	.nextInt(DURATIONS_NUMBER)
+																	+ MIN_DURATION);
+														}
+														numOfJobsPerMachine
+																.put(1, list);
+														list = new ArrayList<Integer>();
+														for (int k = 0; k < numOfJobs2; k++) {
+															list.add(rand
+																	.nextInt(DURATIONS_NUMBER)
+																	+ MIN_DURATION);
+														}
+														numOfJobsPerMachine
+																.put(2, list);
+														list = new ArrayList<Integer>();
+														for (int k = 0; k < numOfJobs3; k++) {
+															list.add(rand
+																	.nextInt(DURATIONS_NUMBER)
+																	+ MIN_DURATION);
+														}
+														numOfJobsPerMachine
+																.put(3, list);
+														list = new ArrayList<Integer>();
+														for (int k = 0; k < numOfJobs4; k++) {
+															list.add(rand
+																	.nextInt(DURATIONS_NUMBER)
+																	+ MIN_DURATION);
+														}
+														numOfJobsPerMachine
+																.put(4, list);
+														list = new ArrayList<Integer>();
+														for (int k = 0; k < numOfJobs5; k++) {
+															list.add(rand
+																	.nextInt(DURATIONS_NUMBER)
+																	+ MIN_DURATION);
+														}
+														numOfJobsPerMachine
+																.put(5, list);
+														list = new ArrayList<Integer>();
+														for (int k = 0; k < numOfJobs6; k++) {
+															list.add(rand
+																	.nextInt(DURATIONS_NUMBER)
+																	+ MIN_DURATION);
+														}
+														numOfJobsPerMachine
+																.put(6, list);
+														list = new ArrayList<Integer>();
+														for (int k = 0; k < numOfJobs7; k++) {
+															list.add(rand
+																	.nextInt(DURATIONS_NUMBER)
+																	+ MIN_DURATION);
+														}
+														numOfJobsPerMachine
+																.put(7, list);
+														if (getMachine(numOfJobsPerMachine) == null)
+															work = false;
 													}
-												Random rand = new Random();
-												ConcurrentHashMap<Integer, List<Integer>> numOfJobsPerMachine = new ConcurrentHashMap<Integer, List<Integer>>();
-												List<Integer> list = new ArrayList<Integer>();
-												for (int k = 0; k < numOfJobs0; k++) {
-													list.add(rand
-															.nextInt(DURATIONS_NUMBER) + 3);
-												}
-												numOfJobsPerMachine
-														.put(0, list);
-												list = new ArrayList<Integer>();
-												for (int k = 0; k < numOfJobs1; k++) {
-													list.add(rand
-															.nextInt(DURATIONS_NUMBER) + 3);
-												}
-												numOfJobsPerMachine
-														.put(1, list);
-												list = new ArrayList<Integer>();
-												for (int k = 0; k < numOfJobs2; k++) {
-													list.add(rand
-															.nextInt(DURATIONS_NUMBER) + 3);
-												}
-												numOfJobsPerMachine
-														.put(2, list);
-												list = new ArrayList<Integer>();
-												for (int k = 0; k < numOfJobs3; k++) {
-													list.add(rand
-															.nextInt(DURATIONS_NUMBER) + 3);
-												}
-												numOfJobsPerMachine
-														.put(3, list);
-												list = new ArrayList<Integer>();
-												for (int k = 0; k < numOfJobs4; k++) {
-													list.add(rand
-															.nextInt(DURATIONS_NUMBER) + 3);
-												}
-												numOfJobsPerMachine
-														.put(4, list);
-												list = new ArrayList<Integer>();
-												for (int k = 0; k < numOfJobs5; k++) {
-													list.add(rand
-															.nextInt(DURATIONS_NUMBER) + 3);
-												}
-												numOfJobsPerMachine
-														.put(5, list);
-												list = new ArrayList<Integer>();
-												for (int k = 0; k < numOfJobs6; k++) {
-													list.add(rand
-															.nextInt(DURATIONS_NUMBER) + 3);
-												}
-												numOfJobsPerMachine
-														.put(6, list);
-												list = new ArrayList<Integer>();
-												for (int k = 0; k < numOfJobs7; k++) {
-													list.add(rand
-															.nextInt(DURATIONS_NUMBER) + 3);
-												}
-												numOfJobsPerMachine
-														.put(7, list);
-												boolean result = makeAllJob(
-														numOfJobsPerMachine,
-														false);
-												if (result) {
-													generatedMachines
-															.put(numOfJobsPerMachine,
-																	machines);
-													generatedJobs
-															.put(numOfJobsPerMachine,
-																	jobs);
-												}
-												store = new Store();
-
-												machines = new ArrayList<Machine>();
-
-												for (int i = 0; i < MACHINES_NUMBER; i++) {
-													machines.add(new Machine(i));
-												}
-
-												List<Job> tmpPrevJobs = new ArrayList<JobshopScheduling.Job>();
-												tmpPrevJobs.addAll(prevJobs);
-
-												prevJobs = new ArrayList<Job>();
-												for (Job job : tmpPrevJobs) {
-													Job tmpJob = new Job(
-															job.id - 1);
-													for (Task task : job.tasks) {
-														tmpJob.addTask(machines
-																.get(task.m.n),
-																task.duration,
-																task.n);
+													boolean result = makeAllJob(
+															numOfJobsPerMachine,
+															false);
+													if (result) {
+														generatedMachines
+																.put(numOfJobsPerMachine,
+																		machines);
+														generatedJobs
+																.put(numOfJobsPerMachine,
+																		jobs);
 													}
-													if (!tmpJob.tasks.isEmpty()) {
-														tmpJob.setConstraints();
-														prevJobs.add(tmpJob);
+													store = new Store();
+
+													machines = new ArrayList<Machine>();
+
+													for (int i = 0; i < MACHINES_NUMBER; i++) {
+														machines.add(new Machine(
+																i));
 													}
+
+													List<Job> tmpPrevJobs = new ArrayList<JobshopScheduling.Job>();
+													tmpPrevJobs
+															.addAll(prevJobs);
+
+													prevJobs = new ArrayList<Job>();
+													for (Job job : tmpPrevJobs) {
+														Job tmpJob = new Job(
+																job.id - 1);
+														for (Task task : job.tasks) {
+															tmpJob.addTask(
+																	machines.get(task.m.n),
+																	task.duration,
+																	task.n);
+														}
+														if (!tmpJob.tasks
+																.isEmpty()) {
+															tmpJob.setConstraints();
+															prevJobs.add(tmpJob);
+														}
+													}
+													jobs = new ArrayList<JobshopScheduling.Job>();
+													vars = new ArrayList<IntVar>();
 												}
-												jobs = new ArrayList<JobshopScheduling.Job>();
-												vars = new ArrayList<IntVar>();
-											}
 
 			}
 		});
-		if (iter == 1)
-			thread.start();
+		thread.start();
 		try {
 			Thread.sleep(DELTA * 1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		setShouldWork(false);
-		// while (thread.isAlive())
-		// ;
+		while (thread.isAlive())
+			;
 	}
 
 	static class Machine {
@@ -394,13 +427,28 @@ public class JobshopScheduling {
 
 		public void printTasks(int delta) {
 			ArrayList<Task> tmpTasks = new ArrayList<Task>();
+			ArrayList<StartEnd> startEnds = new ArrayList<StartEnd>();
 			for (Task task : tasks) {
-				if (task.end.value() <= delta) {
+				if (task.end.value() <= delta
+						&& checkStartEnds(startEnds, task.start.value(),
+								task.end.value())) {
 					tmpTasks.add(task);
+					startEnds.add(new StartEnd(task.start.value(), task.end
+							.value()));
 				}
 			}
 			System.out.println(toString() + tmpTasks);
 		}
+
+	}
+
+	public static boolean checkStartEnds(ArrayList<StartEnd> startEnds,
+			int start, int end) {
+		for (StartEnd startEnd : startEnds)
+			if ((start >= startEnd.getStart() && start < startEnd.getEnd())
+					|| (end > startEnd.getStart() && end <= startEnd.getEnd()))
+				return false;
+		return true;
 	}
 
 	public static class Job {

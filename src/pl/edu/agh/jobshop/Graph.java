@@ -2,6 +2,7 @@ package pl.edu.agh.jobshop;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -49,9 +50,12 @@ public class Graph extends JFrame {
 
 			for (int i = 0; i < m.size(); i++) {
 				g.drawString("" + i, 5, frameHeight * (i + 1) - frameHeight / 2);
-
+				ArrayList<StartEnd> startEnds = new ArrayList<StartEnd>();
 				for (IntVar[] rectangle : m.get(i).rect.getRectangles()) {
-					if ((rectangle[0].value() + rectangle[2].value()) <= delta) {
+					int end = rectangle[0].value() + rectangle[2].value();
+					if (end <= delta
+							&& JobshopScheduling.checkStartEnds(startEnds,
+									rectangle[0].value(), end)) {
 						int x = rectangle[0].value();
 						int width = rectangle[2].value();
 
@@ -63,6 +67,7 @@ public class Graph extends JFrame {
 						g.setColor(Color.black);
 						g.drawString(text, x * widthMultiplyer + 30,
 								frameHeight * i + 60);
+						startEnds.add(new StartEnd(rectangle[0].value(), end));
 					}
 
 				}
