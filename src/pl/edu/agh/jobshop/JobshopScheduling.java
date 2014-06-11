@@ -279,27 +279,29 @@ public class JobshopScheduling {
 			public void run() {
 				generatedMachines = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Machine>>();
 				generatedJobs = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Job>>();
-				for (int num0 = 0; num0 < JOBS_ARR.length && isShouldWork(); num0++) {
+				for (int num0 = JOBS_ARR.length - 1; num0 >= 0
+						&& isShouldWork(); num0--) {
 					int numOfJobs0 = JOBS_ARR[num0];
-					for (int num1 = 0; num1 < JOBS_ARR.length && isShouldWork(); num1++) {
+					for (int num1 = JOBS_ARR.length - 1; num1 >= 0
+							&& isShouldWork(); num1--) {
 						int numOfJobs1 = JOBS_ARR[num1];
-						for (int num2 = 0; num2 < JOBS_ARR.length
-								&& isShouldWork(); num2++) {
+						for (int num2 = JOBS_ARR.length - 1; num2 >= 0
+								&& isShouldWork(); num2--) {
 							int numOfJobs2 = JOBS_ARR[num2];
-							for (int num3 = 0; num3 < JOBS_ARR.length
-									&& isShouldWork(); num3++) {
+							for (int num3 = JOBS_ARR.length - 1; num3 >= 0
+									&& isShouldWork(); num3--) {
 								int numOfJobs3 = JOBS_ARR[num3];
-								for (int num4 = 0; num4 < JOBS_ARR.length
-										&& isShouldWork(); num4++) {
+								for (int num4 = JOBS_ARR.length - 1; num4 >= 0
+										&& isShouldWork(); num4--) {
 									int numOfJobs4 = JOBS_ARR[num4];
-									for (int num5 = 0; num5 < JOBS_ARR.length
-											&& isShouldWork(); num5++) {
+									for (int num5 = JOBS_ARR.length - 1; num5 >= 0
+											&& isShouldWork(); num5--) {
 										int numOfJobs5 = JOBS_ARR[num5];
-										for (int num6 = 0; num6 < JOBS_ARR.length
-												&& isShouldWork(); num6++) {
+										for (int num6 = JOBS_ARR.length - 1; num6 >= 0
+												&& isShouldWork(); num6--) {
 											int numOfJobs6 = JOBS_ARR[num6];
-											for (int num7 = 0; num7 < JOBS_ARR.length
-													&& isShouldWork(); num7++) {
+											for (int num7 = JOBS_ARR.length - 1; num7 >= 0
+													&& isShouldWork(); num7--) {
 												int numOfJobs7 = JOBS_ARR[num7];
 												// for (int num8 = 0; num8 <
 												// JOBS_ARR.length
