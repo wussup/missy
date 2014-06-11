@@ -116,33 +116,41 @@ public class JobshopScheduling {
 
 	private static MachinesAndJobs getRandomMachines(
 			Map<Integer, List<Integer>> numOfJobsPerMachine) {
-		Random rand = new Random();
-		int iter = rand.nextInt(generatedMachines.keySet().size());
-		int i = 0;
 		boolean bool = true;
-
+		int minimumTime = 999999;
+		Map<Integer, List<Integer>> identTemp = null;
+		Map<Integer, List<Integer>> ident = null;
 		for (Map<Integer, List<Integer>> id : generatedMachines.keySet()) {
+			bool = true;
+			int time = 0;
 			for (int j = 0; j < MACHINES_NUMBER; j++) {
-				if (numOfJobsPerMachine.get(j).size() != id.get(j).size())
+				if (numOfJobsPerMachine.get(j).size() <= id.get(j).size()){
+					for (int k = 0; k < id.get(j).size(); k++) {
+						if (numOfJobsPerMachine.get(j).get(k) <= id.get(j).get(
+								k)) {
+							time += id.get(j).get(k);
+							identTemp = id;
+						} else {
+							bool = false;
+						}
+
+					}
+				} else {
 					bool = false;
+				}
 			}
-			List<Machine> value = generatedMachines.get(id);
-			if (bool)
-				return new MachinesAndJobs(value, generatedJobs.get(id));
-			if (iter == i)
-				return new MachinesAndJobs(value, generatedJobs.get(id));
-			i++;
+			
+			if (bool) {
+				if (time < minimumTime) {
+					ident = identTemp;
+				}
+			}
+
 		}
-
-		i = 0;
-
-		for (Map<Integer, List<Integer>> id : generatedMachines.keySet()) {
-			List<Machine> value = generatedMachines.get(id);
-			if (iter == i)
-				return new MachinesAndJobs(value, generatedJobs.get(id));
-			i++;
+		if (ident != null) {
+			List<Machine> value = generatedMachines.get(ident);
+			return new MachinesAndJobs(value, generatedJobs.get(ident));
 		}
-
 		return null;
 	}
 
