@@ -23,12 +23,14 @@ public class JobshopScheduling {
 
 	private static int BIG_NUMBER = 1000;
 	private static final int MACHINES_NUMBER = 8;
-	private static final int JOBS_NUMBER = 30;
+	private static final int JOBS_NUMBER = 3;
 	private static final int JOBS_MIN = 10;
 	private static final int DURATIONS_NUMBER = 3;
 	private static final int MIN_DURATION = 3;
 	private static final int DELTA = 60;
 	private static final int WINDOW_SIZE = DELTA * MACHINES_NUMBER;
+	private static final int[] JOBS_ARR = new int[] { 5, 10, 15 };
+	private static final int[] DUR_ARR = new int[] { 5, 10, 15 };
 	private static int it = 0;
 	private static int lastJobId;
 	private static List<Machine> machines;
@@ -67,10 +69,10 @@ public class JobshopScheduling {
 		Random rand = new Random();
 		Map<Integer, List<Integer>> numOfJobsPerMachine = new LinkedHashMap<Integer, List<Integer>>();
 		for (int i = 0; i < MACHINES_NUMBER; i++) {
-			int numOfJobs = rand.nextInt(JOBS_NUMBER) + JOBS_MIN;
+			int numOfJobs = JOBS_ARR[rand.nextInt(JOBS_ARR.length)];
 			List<Integer> durations = new ArrayList<Integer>();
 			for (int j = 0; j < numOfJobs; j++) {
-				durations.add(rand.nextInt(DURATIONS_NUMBER) + MIN_DURATION);
+				durations.add(DUR_ARR[rand.nextInt(DUR_ARR.length)]);
 			}
 			numOfJobsPerMachine.put(i, durations);
 		}
@@ -277,51 +279,49 @@ public class JobshopScheduling {
 			public void run() {
 				generatedMachines = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Machine>>();
 				generatedJobs = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Job>>();
-				for (int numOfJobs0 = JOBS_MIN; numOfJobs0 <= JOBS_NUMBER
-						+ JOBS_MIN
-						&& isShouldWork(); numOfJobs0++)
-					for (int numOfJobs1 = JOBS_MIN; numOfJobs1 <= JOBS_NUMBER
-							+ JOBS_MIN
-							&& isShouldWork(); numOfJobs1++)
-						for (int numOfJobs2 = JOBS_MIN; numOfJobs2 <= JOBS_NUMBER
-								+ JOBS_MIN
-								&& isShouldWork(); numOfJobs2++)
-							for (int numOfJobs3 = JOBS_MIN; numOfJobs3 <= JOBS_NUMBER
-									+ JOBS_MIN
-									&& isShouldWork(); numOfJobs3++)
-								for (int numOfJobs4 = JOBS_MIN; numOfJobs4 <= JOBS_NUMBER
-										+ JOBS_MIN
-										&& isShouldWork(); numOfJobs4++)
-									for (int numOfJobs5 = JOBS_MIN; numOfJobs5 <= JOBS_NUMBER
-											+ JOBS_MIN
-											&& isShouldWork(); numOfJobs5++)
-										for (int numOfJobs6 = JOBS_MIN; numOfJobs6 <= JOBS_NUMBER
-												+ JOBS_MIN
-												&& isShouldWork(); numOfJobs6++)
-											for (int numOfJobs7 = JOBS_MIN; numOfJobs7 <= JOBS_NUMBER
-													+ JOBS_MIN
-													&& isShouldWork(); numOfJobs7++)
-												for (int numOfJobs8 = JOBS_MIN; numOfJobs8 <= JOBS_NUMBER
-														+ JOBS_MIN
-														&& isShouldWork(); numOfJobs8++)
-													for (int numOfJobs9 = JOBS_MIN; numOfJobs9 <= JOBS_NUMBER
-															+ JOBS_MIN
-															&& isShouldWork(); numOfJobs9++)
-														for (int numOfJobs10 = JOBS_MIN; numOfJobs10 <= JOBS_NUMBER
-																+ JOBS_MIN
-																&& isShouldWork(); numOfJobs10++)
-															for (int numOfJobs11 = JOBS_MIN; numOfJobs11 <= JOBS_NUMBER
-																	+ JOBS_MIN
-																	&& isShouldWork(); numOfJobs11++)
-																for (int numOfJobs12 = JOBS_MIN; numOfJobs12 <= JOBS_NUMBER
-																		+ JOBS_MIN
-																		&& isShouldWork(); numOfJobs12++)
-																	for (int numOfJobs13 = JOBS_MIN; numOfJobs13 <= JOBS_NUMBER
-																			+ JOBS_MIN
-																			&& isShouldWork(); numOfJobs13++)
-																		for (int numOfJobs14 = JOBS_MIN; numOfJobs14 <= JOBS_NUMBER
-																				+ JOBS_MIN
-																				&& isShouldWork(); numOfJobs14++)
+				for (int num0 = 0; num0 < JOBS_ARR.length && isShouldWork(); num0++) {
+					int numOfJobs0 = JOBS_ARR[num0];
+					for (int num1 = 0; num1 < JOBS_ARR.length && isShouldWork(); num1++) {
+						int numOfJobs1 = JOBS_ARR[num1];
+						for (int num2 = 0; num2 < JOBS_ARR.length
+								&& isShouldWork(); num2++) {
+							int numOfJobs2 = JOBS_ARR[num2];
+							for (int num3 = 0; num3 < JOBS_ARR.length
+									&& isShouldWork(); num3++) {
+								int numOfJobs3 = JOBS_ARR[num3];
+								for (int num4 = 0; num4 < JOBS_ARR.length
+										&& isShouldWork(); num4++) {
+									int numOfJobs4 = JOBS_ARR[num4];
+									for (int num5 = 0; num5 < JOBS_ARR.length
+											&& isShouldWork(); num5++) {
+										int numOfJobs5 = JOBS_ARR[num5];
+										for (int num6 = 0; num6 < JOBS_ARR.length
+												&& isShouldWork(); num6++) {
+											int numOfJobs6 = JOBS_ARR[num6];
+											for (int num7 = 0; num7 < JOBS_ARR.length
+													&& isShouldWork(); num7++) {
+												int numOfJobs7 = JOBS_ARR[num7];
+												for (int num8 = 0; num8 < JOBS_ARR.length
+														&& isShouldWork(); num8++) {
+													int numOfJobs8 = JOBS_ARR[num8];
+													for (int num9 = 0; num9 < JOBS_ARR.length
+															&& isShouldWork(); num9++) {
+														int numOfJobs9 = JOBS_ARR[num9];
+														for (int num10 = 0; num10 < JOBS_ARR.length
+																&& isShouldWork(); num10++) {
+															int numOfJobs10 = JOBS_ARR[num10];
+															for (int num11 = 0; num11 < JOBS_ARR.length
+																	&& isShouldWork(); num11++) {
+																int numOfJobs11 = JOBS_ARR[num11];
+																for (int num12 = 0; num12 < JOBS_ARR.length
+																		&& isShouldWork(); num12++) {
+																	int numOfJobs12 = JOBS_ARR[num12];
+																	for (int num13 = 0; num13 < JOBS_ARR.length
+																			&& isShouldWork(); num13++) {
+																		int numOfJobs13 = JOBS_ARR[num13];
+																		for (int num14 = 0; num14 < JOBS_ARR.length
+																				&& isShouldWork(); num14++) {
+																			int numOfJobs14 = JOBS_ARR[num14];
 																			for (long worker = 0; worker < numOfJobs0
 																					* numOfJobs1
 																					* numOfJobs2
@@ -347,135 +347,120 @@ public class JobshopScheduling {
 																				numOfJobsPerMachine = new ConcurrentHashMap<Integer, List<Integer>>();
 																				List<Integer> list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs0; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(0,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs1; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(1,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs2; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(2,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs3; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(3,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs4; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(4,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs5; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(5,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs6; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(6,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs7; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(7,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs8; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(8,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs9; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(9,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs10; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(10,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs11; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(11,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs12; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(12,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs13; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(13,
 																								list);
 																				list = new ArrayList<Integer>();
 																				for (int k = 0; k < numOfJobs14; k++) {
-																					list.add(rand
-																							.nextInt(DURATIONS_NUMBER)
-																							+ MIN_DURATION);
+																					list.add(DUR_ARR[rand
+																							.nextInt(DUR_ARR.length)]);
 																				}
 																				numOfJobsPerMachine
 																						.put(14,
@@ -528,6 +513,21 @@ public class JobshopScheduling {
 																					vars = new ArrayList<IntVar>();
 																				}
 																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 
 			}
 		});
