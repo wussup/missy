@@ -27,11 +27,13 @@ public class JobshopScheduling {
 	private static final int JOBS_MIN = 10;
 	private static final int DURATIONS_NUMBER = 3;
 	private static final int MIN_DURATION = 3;
-	private static final int DELTA = 30;
+	private static final int DELTA = 60;
 	private static final int WINDOW_SIZE = DELTA * MACHINES_NUMBER;
 	private static final int[] JOBS_ARR = new int[] { 1, 2 /* , 3 */};
 	private static final int[] DUR_ARR = new int[] { 2, 3 /* 10, 15 */};
 	private static int it = 0;
+	// private static double maxGenPlan;
+	// private static int genPlans;
 	private static int lastJobId;
 	private static List<Machine> machines;
 	private static List<Job> jobs;
@@ -42,11 +44,16 @@ public class JobshopScheduling {
 	private static ArrayList<IntVar> vars = new ArrayList<IntVar>();
 	private static boolean shouldWork;
 	private static FileWriter fileWriter = new FileWriter("results.txt");
-	private static	FileWriter fw = new FileWriter("kutaski2.txt");
+	private static FileWriter fw = new FileWriter("kutaski2.txt");
 	private static float allSum = 0;
 
 	public static void main(String[] args) {
 		long T1, T2, T;
+
+		// maxGenPlan = Math.pow(
+		// Math.pow(DUR_ARR.length, countSum(JOBS_ARR.length)),
+		// MACHINES_NUMBER);
+
 		T1 = System.currentTimeMillis();
 
 		lastJobId = 0;
@@ -64,6 +71,13 @@ public class JobshopScheduling {
 		T2 = System.currentTimeMillis();
 		T = T2 - T1;
 		System.out.println("\n\t*** Execution time = " + T + " ms");
+	}
+
+	private static double countSum(int length) {
+		int sum = 0;
+		for (int i = 1; i <= length; i++)
+			sum += i;
+		return sum;
 	}
 
 	private static void jobshopScheduling() {
@@ -123,7 +137,7 @@ public class JobshopScheduling {
 		int minimumTime = 999999;
 		Map<Integer, List<Integer>> identTemp = null;
 		Map<Integer, List<Integer>> ident = null;
-				for (Map<Integer, List<Integer>> id : generatedMachines.keySet()) {
+		for (Map<Integer, List<Integer>> id : generatedMachines.keySet()) {
 			bool = true;
 			int time = 0;
 			for (int j = 0; j < MACHINES_NUMBER; j++) {
@@ -156,16 +170,17 @@ public class JobshopScheduling {
 			int selectedPlanTime = 0;
 			float percent;
 			for (int j = 0; j < MACHINES_NUMBER; j++) {
-				for (int i =0 ; i<numOfJobsPerMachine.get(j).size(); i++){
+				for (int i = 0; i < numOfJobsPerMachine.get(j).size(); i++) {
 					selectedPlanTime += numOfJobsPerMachine.get(j).get(i);
-				}				
-				for (int i=0; i<ident.get(j).size(); i++){
+				}
+				for (int i = 0; i < ident.get(j).size(); i++) {
 					generadetPlanTime += ident.get(j).get(i);
 				}
 			}
-			
-			percent = (float) (generadetPlanTime-selectedPlanTime)/generadetPlanTime; 
-			fw.write("Iteration " +it +": " + percent*100 + " %\n\n");
+
+			percent = (float) (generadetPlanTime - selectedPlanTime)
+					/ generadetPlanTime;
+			fw.write("Iteration " + it + ": " + percent * 100 + " %\n\n");
 			return new MachinesAndJobs(value, generatedJobs.get(ident));
 		}
 		return null;
@@ -302,6 +317,7 @@ public class JobshopScheduling {
 			public void run() {
 				generatedMachines = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Machine>>();
 				generatedJobs = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Job>>();
+				// genPlans = 1;
 				generateTheMostBiggerPlan();
 				for (int num0 = JOBS_ARR.length - 1; num0 >= 0
 						&& isShouldWork(); num0--) {
@@ -362,28 +378,38 @@ public class JobshopScheduling {
 												// && isShouldWork(); num14++) {
 												// int numOfJobs14 =
 												// JOBS_ARR[num14];
-												for (long worker = 0; worker < DUR_ARR.length
-														* DUR_ARR.length
-														* DUR_ARR.length
-														* DUR_ARR.length
-														* DUR_ARR.length
-														* DUR_ARR.length
-														* DUR_ARR.length
-														* DUR_ARR.length // numOfJobs0
-												// * numOfJobs1
-												// * numOfJobs2
-												// * numOfJobs3
-												// * numOfJobs4
-												// * numOfJobs5
-												// * numOfJobs6
-												// * numOfJobs7
-												// * numOfJobs8
-												// * numOfJobs9
-												// * numOfJobs10
-												// * numOfJobs11
-												// * numOfJobs12
-												// * numOfJobs13
-												// * numOfJobs14
+												for (long worker = 0; worker < Math
+														.pow(DUR_ARR.length,
+																numOfJobs0
+																		+ numOfJobs1
+																		+ numOfJobs2
+																		+ numOfJobs3
+																		+ numOfJobs4
+																		+ numOfJobs5
+																		+ numOfJobs6
+																		+ numOfJobs7)
+														// * DUR_ARR.length
+														// * DUR_ARR.length
+														// * DUR_ARR.length
+														// * DUR_ARR.length
+														// * DUR_ARR.length
+														// * DUR_ARR.length
+														// * DUR_ARR.length //
+														// numOfJobs0
+														// * numOfJobs1
+														// * numOfJobs2
+														// * numOfJobs3
+														// * numOfJobs4
+														// * numOfJobs5
+														// * numOfJobs6
+														// * numOfJobs7
+														// * numOfJobs8
+														// * numOfJobs9
+														// * numOfJobs10
+														// * numOfJobs11
+														// * numOfJobs12
+														// * numOfJobs13
+														// * numOfJobs14
 														&& shouldWork; worker++) {
 													Random rand = new Random();
 													boolean work = false;
@@ -525,6 +551,7 @@ public class JobshopScheduling {
 																.println("JUZ JEST W BAZIE!!!");
 													// }
 													if (work) {
+														// genPlans++;
 														boolean result = makeAllJob(
 																numOfJobsPerMachine,
 																false);
@@ -577,6 +604,8 @@ public class JobshopScheduling {
 						}
 						// }
 					}
+					// fileWriter.write("Generated plans: " + (float) genPlans
+					// / maxGenPlan * 100);
 					// }
 					// }
 					// }
@@ -604,7 +633,7 @@ public class JobshopScheduling {
 		numOfJobsPerMachine = new ConcurrentHashMap<Integer, List<Integer>>();
 		List<Integer> list = new ArrayList<Integer>();
 		int numOfJobs = JOBS_ARR[JOBS_ARR.length - 1];
-		int duration = DUR_ARR[DUR_ARR.length-1];
+		int duration = DUR_ARR[DUR_ARR.length - 1];
 		for (int k = 0; k < numOfJobs; k++) {
 			list.add(duration);
 		}
