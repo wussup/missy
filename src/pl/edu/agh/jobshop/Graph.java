@@ -22,7 +22,7 @@ public class Graph extends JFrame {
 		super("plotter");
 		this.m = m;
 		this.delta = delta;
-		setSize(1500, 800);
+		setSize(1500, 1000);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		add(new DrawingPane());
@@ -60,13 +60,13 @@ public class Graph extends JFrame {
 						int width = rectangle[2].value();
 
 						String text = rectangle[0].id();
-						int color = Integer.parseInt(text.substring(1, 2));
-						g.setColor(colors[color - 1]);
+						int color = Integer.parseInt(text.substring(1, 2)) % colors.length;
+						g.setColor(colors[color]);
 						g.drawRect(x * widthMultiplyer + 20, frameHeight * i
 								+ 20, width * widthMultiplyer, frameHeight - 20);
 						g.setColor(Color.black);
 						g.drawString(text, x * widthMultiplyer + 30,
-								frameHeight * i + 60);
+								frameHeight * i + 30);
 						startEnds.add(new StartEnd(rectangle[0].value(), end));
 					}
 
