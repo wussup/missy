@@ -126,9 +126,10 @@ public class JobshopScheduling {
 			bool = true;
 			int time = 0;
 			for (int j = 0; j < MACHINES_NUMBER; j++) {
-				if (numOfJobsPerMachine.get(j).size() <= id.get(j).size()){
+				if (numOfJobsPerMachine.get(j).size() <= id.get(j).size()) {
 					for (int k = 0; k < numOfJobsPerMachine.get(j).size(); k++) {
-						if (numOfJobsPerMachine.get(j).get(k) <= id.get(j).get(k)) {
+						if (numOfJobsPerMachine.get(j).get(k) <= id.get(j).get(
+								k)) {
 							time += id.get(j).get(k);
 							identTemp = id;
 						} else {
@@ -140,7 +141,7 @@ public class JobshopScheduling {
 					bool = false;
 				}
 			}
-			
+
 			if (bool) {
 				if (time < minimumTime) {
 					ident = identTemp;
@@ -286,6 +287,7 @@ public class JobshopScheduling {
 			public void run() {
 				generatedMachines = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Machine>>();
 				generatedJobs = new ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Job>>();
+				generateTheMostBiggerPlan();
 				for (int num0 = JOBS_ARR.length - 1; num0 >= 0
 						&& isShouldWork(); num0--) {
 					int numOfJobs0 = JOBS_ARR[num0];
@@ -579,6 +581,83 @@ public class JobshopScheduling {
 		setShouldWork(false);
 		while (thread.isAlive())
 			;
+	}
+
+	protected static void generateTheMostBiggerPlan() {
+		ConcurrentHashMap<Integer, List<Integer>> numOfJobsPerMachine = new ConcurrentHashMap<Integer, List<Integer>>();
+
+		numOfJobsPerMachine = new ConcurrentHashMap<Integer, List<Integer>>();
+		List<Integer> list = new ArrayList<Integer>();
+		int numOfJobs = JOBS_ARR[JOBS_ARR.length - 1];
+		int duration = DUR_ARR[DUR_ARR.length-1];
+		for (int k = 0; k < numOfJobs; k++) {
+			list.add(duration);
+		}
+		numOfJobsPerMachine.put(0, list);
+		list = new ArrayList<Integer>();
+		for (int k = 0; k < numOfJobs; k++) {
+			list.add(duration);
+		}
+		numOfJobsPerMachine.put(1, list);
+		list = new ArrayList<Integer>();
+		for (int k = 0; k < numOfJobs; k++) {
+			list.add(duration);
+		}
+		numOfJobsPerMachine.put(2, list);
+		list = new ArrayList<Integer>();
+		for (int k = 0; k < numOfJobs; k++) {
+			list.add(duration);
+		}
+		numOfJobsPerMachine.put(3, list);
+		list = new ArrayList<Integer>();
+		for (int k = 0; k < numOfJobs; k++) {
+			list.add(duration);
+		}
+		numOfJobsPerMachine.put(4, list);
+		list = new ArrayList<Integer>();
+		for (int k = 0; k < numOfJobs; k++) {
+			list.add(duration);
+		}
+		numOfJobsPerMachine.put(5, list);
+		list = new ArrayList<Integer>();
+		for (int k = 0; k < numOfJobs; k++) {
+			list.add(duration);
+		}
+		numOfJobsPerMachine.put(6, list);
+		list = new ArrayList<Integer>();
+		for (int k = 0; k < numOfJobs; k++) {
+			list.add(duration);
+		}
+		numOfJobsPerMachine.put(7, list);
+		boolean result = makeAllJob(numOfJobsPerMachine, false);
+		if (result) {
+			generatedMachines.put(numOfJobsPerMachine, machines);
+			generatedJobs.put(numOfJobsPerMachine, jobs);
+		}
+		store = new Store();
+
+		machines = new ArrayList<Machine>();
+
+		for (int i = 0; i < MACHINES_NUMBER; i++) {
+			machines.add(new Machine(i));
+		}
+
+		List<Job> tmpPrevJobs = new ArrayList<JobshopScheduling.Job>();
+		tmpPrevJobs.addAll(prevJobs);
+
+		prevJobs = new ArrayList<Job>();
+		for (Job job : tmpPrevJobs) {
+			Job tmpJob = new Job(job.id - 1);
+			for (Task task : job.tasks) {
+				tmpJob.addTask(machines.get(task.m.n), task.duration, task.n);
+			}
+			if (!tmpJob.tasks.isEmpty()) {
+				tmpJob.setConstraints();
+				prevJobs.add(tmpJob);
+			}
+		}
+		jobs = new ArrayList<JobshopScheduling.Job>();
+		vars = new ArrayList<IntVar>();
 	}
 
 	static class Machine {
