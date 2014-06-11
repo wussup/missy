@@ -27,10 +27,10 @@ public class JobshopScheduling {
 	private static final int JOBS_MIN = 10;
 	private static final int DURATIONS_NUMBER = 3;
 	private static final int MIN_DURATION = 3;
-	private static final int DELTA = 30;
+	private static final int DELTA = 10;
 	private static final int WINDOW_SIZE = DELTA * MACHINES_NUMBER;
-	private static final int[] JOBS_ARR = new int[] { 1, 2 /* , 3 */};
-	private static final int[] DUR_ARR = new int[] { 2, 3 /* 10, 15 */};
+	private static final int[] JOBS_ARR = new int[] { 3, 5, 7, 8};
+	private static final int[] DUR_ARR = new int[] { 2, 3, 4, 5};
 	private static int it = 0;
 	private static int lastJobId;
 	private static List<Machine> machines;
@@ -42,7 +42,10 @@ public class JobshopScheduling {
 	private static ArrayList<IntVar> vars = new ArrayList<IntVar>();
 	private static boolean shouldWork;
 	private static FileWriter fileWriter = new FileWriter("results.txt");
+	private static	FileWriter fw = new FileWriter("kutaski2.txt");
 	private static float allSum = 0;
+	
+	private static float metric = 0;
 
 	public static void main(String[] args) {
 		long T1, T2, T;
@@ -122,7 +125,7 @@ public class JobshopScheduling {
 		int minimumTime = 999999;
 		Map<Integer, List<Integer>> identTemp = null;
 		Map<Integer, List<Integer>> ident = null;
-		for (Map<Integer, List<Integer>> id : generatedMachines.keySet()) {
+				for (Map<Integer, List<Integer>> id : generatedMachines.keySet()) {
 			bool = true;
 			int time = 0;
 			for (int j = 0; j < MACHINES_NUMBER; j++) {
@@ -151,6 +154,25 @@ public class JobshopScheduling {
 		}
 		if (ident != null) {
 			List<Machine> value = generatedMachines.get(ident);
+			int generadetPlanTime = 0;
+			int selectedPlanTime = 0;
+			float percent;
+			for (int j = 0; j < MACHINES_NUMBER; j++) {
+				for (int i =0 ; i<numOfJobsPerMachine.get(j).size(); i++){
+					selectedPlanTime += numOfJobsPerMachine.get(j).get(i);
+				}				
+				for (int i=0; i<ident.get(j).size(); i++){
+					generadetPlanTime += ident.get(j).get(i);
+				}
+			}
+			
+			percent = (float) (generadetPlanTime-selectedPlanTime)/generadetPlanTime; 
+			fw.write("Iteration " +it +": " + percent*100 + " %\n\n");
+			metric += metric*100;
+			if (it==4){
+				metric /= 4;
+				fw.write("/nSumaric metric: " + metric + " %.");
+			}
 			return new MachinesAndJobs(value, generatedJobs.get(ident));
 		}
 		return null;
