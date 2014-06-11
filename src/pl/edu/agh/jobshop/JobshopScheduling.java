@@ -127,9 +127,8 @@ public class JobshopScheduling {
 			int time = 0;
 			for (int j = 0; j < MACHINES_NUMBER; j++) {
 				if (numOfJobsPerMachine.get(j).size() <= id.get(j).size()){
-					for (int k = 0; k < id.get(j).size(); k++) {
-						if (numOfJobsPerMachine.get(j).get(k) <= id.get(j).get(
-								k)) {
+					for (int k = 0; k < numOfJobsPerMachine.get(j).size(); k++) {
+						if (numOfJobsPerMachine.get(j).get(k) <= id.get(j).get(k)) {
 							time += id.get(j).get(k);
 							identTemp = id;
 						} else {
