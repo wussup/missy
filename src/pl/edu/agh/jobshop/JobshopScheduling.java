@@ -27,10 +27,10 @@ public class JobshopScheduling {
 	private static final int JOBS_MIN = 10;
 	private static final int DURATIONS_NUMBER = 3;
 	private static final int MIN_DURATION = 3;
-	private static final int DELTA = 60;
+	private static final int DELTA = 20;
 	private static final int WINDOW_SIZE = DELTA * MACHINES_NUMBER;
-	private static final int[] JOBS_ARR = new int[] { 1, 2};
-	private static final int[] DUR_ARR = new int[] { 3, 6};
+	private static final int[] JOBS_ARR = new int[] { 2,4,8};
+	private static final int[] DUR_ARR = new int[] { 5,10,15};
 	private static int it = 0;
 	private static int lastJobId;
 	private static List<Machine> machines;
@@ -46,6 +46,7 @@ public class JobshopScheduling {
 	private static float allSum = 0;
 
 	private static float metric = 0;
+	private static float metricNumber = 0;
 
 	public static void main(String[] args) {
 		long T1, T2, T;
@@ -169,10 +170,13 @@ public class JobshopScheduling {
 			percent = (float) (generadetPlanTime - selectedPlanTime)
 					/ generadetPlanTime;
 			fw.write("Iteration " + it + ": " + "gen: " + generadetPlanTime + "; sel: " + selectedPlanTime + "; metric: " + percent * 100 + " %\n\n");
+			metricNumber += (generadetPlanTime-selectedPlanTime);
 			metric += percent * 100;
 			if (it == 4) {
 				metric /= 4;
+				metricNumber /= 4;
 				fw.write("\nSumaric metric: " + metric + " %.");
+				fw.write("\nNumber of metric: " + metricNumber+"\n");
 			}
 			return new MachinesAndJobs(value, generatedJobs.get(ident));
 		}
