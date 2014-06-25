@@ -5,6 +5,10 @@ import java.util.List;
 import pl.edu.agh.jobshop.JobshopScheduling.Job;
 import pl.edu.agh.jobshop.JobshopScheduling.Machine;
 
+/**
+ *	Helper class which is created for manage machines and connection between machines and jobs 
+ *
+ */
 public class MachinesAndJobs {
 
 	private List<Machine> machines;

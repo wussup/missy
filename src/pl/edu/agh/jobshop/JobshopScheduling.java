@@ -22,22 +22,66 @@ import org.jacop.search.SmallestDomain;
 public class JobshopScheduling {
 
 	private static int BIG_NUMBER = 1000;
+
+	/**
+	 * Amount of machines
+	 */
 	private static final int MACHINES_NUMBER = 8;
-	private static final int JOBS_NUMBER = 3;
-	private static final int JOBS_MIN = 10;
-	private static final int DURATIONS_NUMBER = 3;
-	private static final int MIN_DURATION = 3;
+
+	/**
+	 * Time delta
+	 */
 	private static final int DELTA = 20;
+
+	/**
+	 * Window size
+	 */
 	private static final int WINDOW_SIZE = DELTA * MACHINES_NUMBER;
-	private static final int[] JOBS_ARR = new int[] { 2,4,8};
-	private static final int[] DUR_ARR = new int[] { 5,10,15};
+
+	/**
+	 * Array of amount of jobs
+	 */
+	private static final int[] JOBS_ARR = new int[] { 1, 2, 3 };
+
+	/**
+	 * Array of job durations
+	 */
+	private static final int[] DUR_ARR = new int[] { 5, 10, 15 };
+
+	/**
+	 * Number of iteration
+	 */
 	private static int it = 0;
+
+	// TODO CHECK
+	/**
+	 * Last executed job Id
+	 */
 	private static int lastJobId;
+
+	/**
+	 * List of using machnies
+	 */
 	private static List<Machine> machines;
+
+	// TODO CHECK
+	/**
+	 * List of current jobs
+	 */
 	private static List<Job> jobs;
 	private static Store store;
 	private static List<Job> prevJobs;
+
+	// TODO CHECK - poprawiæ
+	/**
+	 * Map which contains map as a key and list of machines as a value
+	 */
 	private static ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Machine>> generatedMachines;
+
+	// TODO CHECK - poprawiæ
+	/**
+	 * Map which contains map as a key and list of jobs as a value
+	 */
 	private static ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Job>> generatedJobs;
 	private static ArrayList<IntVar> vars = new ArrayList<IntVar>();
 	private static boolean shouldWork;
@@ -66,7 +110,8 @@ public class JobshopScheduling {
 
 		T2 = System.currentTimeMillis();
 		T = T2 - T1;
-		System.out.println("\n\t*** Execution time = " + T + " ms");
+		System.out.println("\n\t*** Execution time = " + T + " ms\n");
+
 	}
 
 	private static void jobshopScheduling() {
@@ -129,9 +174,10 @@ public class JobshopScheduling {
 		for (Map<Integer, List<Integer>> id : generatedMachines.keySet()) {
 			bool = true;
 			int time = 0;
-			for (int j = 0; j < MACHINES_NUMBER; j++) {
+			for (int j = 0; j < MACHINES_NUMBER && bool; j++) {
 				if (numOfJobsPerMachine.get(j).size() <= id.get(j).size()) {
-					for (int k = 0; k < numOfJobsPerMachine.get(j).size(); k++) {
+					for (int k = 0; k < numOfJobsPerMachine.get(j).size()
+							&& bool; k++) {
 						if (numOfJobsPerMachine.get(j).get(k) <= id.get(j).get(
 								k)) {
 							time += id.get(j).get(k);
@@ -148,6 +194,7 @@ public class JobshopScheduling {
 
 			if (bool) {
 				if (time < minimumTime) {
+					minimumTime = time;
 					ident = identTemp;
 				}
 			}
@@ -169,14 +216,16 @@ public class JobshopScheduling {
 
 			percent = (float) (generadetPlanTime - selectedPlanTime)
 					/ generadetPlanTime;
-			fw.write("Iteration " + it + ": " + "gen: " + generadetPlanTime + "; sel: " + selectedPlanTime + "; metric: " + percent * 100 + " %\n\n");
-			metricNumber += (generadetPlanTime-selectedPlanTime);
+			fw.write("Iteration " + it + ": " + "gen: " + generadetPlanTime
+					+ "; sel: " + selectedPlanTime + "; metric: " + percent
+					* 100 + " %\n\n");
+			metricNumber += (generadetPlanTime - selectedPlanTime);
 			metric += percent * 100;
 			if (it == 4) {
 				metric /= 4;
 				metricNumber /= 4;
 				fw.write("\nSumaric metric: " + metric + " %.");
-				fw.write("\nNumber of metric: " + metricNumber+"\n");
+				fw.write("\nNumber of metric: " + metricNumber + "\n");
 			}
 			return new MachinesAndJobs(value, generatedJobs.get(ident));
 		}

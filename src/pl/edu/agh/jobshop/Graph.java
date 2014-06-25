@@ -12,12 +12,23 @@ import org.jacop.core.IntVar;
 
 import pl.edu.agh.jobshop.JobshopScheduling.Machine;
 
+/**
+ * Class created to generate selected plan as a graph (Gannt diagram) 
+ *
+ */
 @SuppressWarnings("serial")
 public class Graph extends JFrame {
 
 	List<Machine> m;
 	private int delta;
 
+	/**
+	 * class constructor
+	 * @param m
+	 * 	list of machines
+	 * @param delta
+	 * 	Time delta
+	 */
 	public Graph(List<Machine> m, int delta) {
 		super("plotter");
 		this.m = m;
@@ -30,6 +41,9 @@ public class Graph extends JFrame {
 		setVisible(true);
 	}
 
+	/**
+	 * Create a content of a graph
+	 */
 	private class DrawingPane extends JPanel {
 
 		@Override
