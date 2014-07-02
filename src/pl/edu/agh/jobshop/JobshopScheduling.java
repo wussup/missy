@@ -27,10 +27,10 @@ public class JobshopScheduling {
 	private static final int JOBS_MIN = 10;
 	private static final int DURATIONS_NUMBER = 3;
 	private static final int MIN_DURATION = 3;
-	private static final int DELTA = 20;
+	private static int DELTA;
 	private static final int WINDOW_SIZE = DELTA * MACHINES_NUMBER;
-	private static final int[] JOBS_ARR = new int[] { 2,4,8};
-	private static final int[] DUR_ARR = new int[] { 5,10,15};
+	private static final int[] JOBS_ARR = new int[] { 4, 8 };
+	private static final int[] DUR_ARR = new int[] { 5, 10 };
 	private static int it = 0;
 	private static int lastJobId;
 	private static List<Machine> machines;
@@ -49,24 +49,36 @@ public class JobshopScheduling {
 	private static float metricNumber = 0;
 
 	public static void main(String[] args) {
-		long T1, T2, T;
-		T1 = System.currentTimeMillis();
+		for (DELTA = 10; DELTA <= 120; DELTA += 10) {
+			long T1, T2, T;
+			T1 = System.currentTimeMillis();
 
-		lastJobId = 0;
-		store = new Store();
+			lastJobId = 0;
+			store = new Store();
 
-		machines = new ArrayList<Machine>();
+			machines = new ArrayList<Machine>();
 
-		for (int i = 0; i < MACHINES_NUMBER; i++) {
-			machines.add(new Machine(i));
+			for (int i = 0; i < MACHINES_NUMBER; i++) {
+				machines.add(new Machine(i));
+			}
+			jobs = new ArrayList<JobshopScheduling.Job>();
+
+			jobshopScheduling();
+
+			T2 = System.currentTimeMillis();
+			T = T2 - T1;
+			System.out.println("\n\t*** Execution time = " + T + " ms");
+			it = 0;
+			generatedMachines = null;
+			generatedJobs = null;
+			prevJobs = new ArrayList<JobshopScheduling.Job>();
+			vars = new ArrayList<IntVar>();
+			setShouldWork(false);
+			allSum = 0;
+
+			metric = 0;
+			metricNumber = 0;
 		}
-		jobs = new ArrayList<JobshopScheduling.Job>();
-
-		jobshopScheduling();
-
-		T2 = System.currentTimeMillis();
-		T = T2 - T1;
-		System.out.println("\n\t*** Execution time = " + T + " ms");
 	}
 
 	private static void jobshopScheduling() {
@@ -129,9 +141,10 @@ public class JobshopScheduling {
 		for (Map<Integer, List<Integer>> id : generatedMachines.keySet()) {
 			bool = true;
 			int time = 0;
-			for (int j = 0; j < MACHINES_NUMBER; j++) {
+			for (int j = 0; j < MACHINES_NUMBER && bool; j++) {
 				if (numOfJobsPerMachine.get(j).size() <= id.get(j).size()) {
-					for (int k = 0; k < numOfJobsPerMachine.get(j).size(); k++) {
+					for (int k = 0; k < numOfJobsPerMachine.get(j).size()
+							&& bool; k++) {
 						if (numOfJobsPerMachine.get(j).get(k) <= id.get(j).get(
 								k)) {
 							time += id.get(j).get(k);
@@ -148,6 +161,7 @@ public class JobshopScheduling {
 
 			if (bool) {
 				if (time < minimumTime) {
+					minimumTime = time;
 					ident = identTemp;
 				}
 			}
@@ -169,14 +183,16 @@ public class JobshopScheduling {
 
 			percent = (float) (generadetPlanTime - selectedPlanTime)
 					/ generadetPlanTime;
-			fw.write("Iteration " + it + ": " + "gen: " + generadetPlanTime + "; sel: " + selectedPlanTime + "; metric: " + percent * 100 + " %\n\n");
-			metricNumber += (generadetPlanTime-selectedPlanTime);
+			fw.write("Iteration " + it + ": " + "gen: " + generadetPlanTime
+					+ "; sel: " + selectedPlanTime + "; metric: " + percent
+					* 100 + " %\n\n");
+			metricNumber += (generadetPlanTime - selectedPlanTime);
 			metric += percent * 100;
 			if (it == 4) {
 				metric /= 4;
 				metricNumber /= 4;
 				fw.write("\nSumaric metric: " + metric + " %.");
-				fw.write("\nNumber of metric: " + metricNumber+"\n");
+				fw.write("\nNumber of metric: " + metricNumber + "\n");
 			}
 			return new MachinesAndJobs(value, generatedJobs.get(ident));
 		}
