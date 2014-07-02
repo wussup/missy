@@ -53,7 +53,6 @@ public class JobshopScheduling {
 	 */
 	private static int it = 0;
 
-	// TODO CHECK
 	/**
 	 * Last executed job Id
 	 */
@@ -64,32 +63,58 @@ public class JobshopScheduling {
 	 */
 	private static List<Machine> machines;
 
-	// TODO CHECK
 	/**
 	 * List of current jobs
 	 */
 	private static List<Job> jobs;
+
+	/**
+	 * Store that contains all constrains for DFS algorithm
+	 */
 	private static Store store;
+	/**
+	 * Jobs that was not executed at previous iteration
+	 */
 	private static List<Job> prevJobs;
 
-	// TODO CHECK - poprawiæ
 	/**
-	 * Map which contains map as a key and list of machines as a value
+	 * Map which contains configuration of tasks as a key and generated plan for
+	 * these tasks as a value
 	 */
 	private static ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Machine>> generatedMachines;
 
-	// TODO CHECK - poprawiæ
 	/**
-	 * Map which contains map as a key and list of jobs as a value
+	 * Map which contains configuration of tasks as a key and jobs as a value
 	 */
 	private static ConcurrentHashMap<ConcurrentHashMap<Integer, List<Integer>>, List<Job>> generatedJobs;
+	/**
+	 * List of constrains
+	 */
 	private static ArrayList<IntVar> vars = new ArrayList<IntVar>();
+	/**
+	 * Does thread should work
+	 */
 	private static boolean shouldWork;
+	/**
+	 * File writer results
+	 */
 	private static FileWriter fileWriter = new FileWriter("results.txt");
+	/**
+	 * File writer metric
+	 */
 	private static FileWriter fw = new FileWriter("metric.txt");
+	/**
+	 * All sum of tasks executed at one iteration
+	 */
 	private static float allSum = 0;
 
+	/**
+	 * Metric of tasks executed at one iteration
+	 */
 	private static float metric = 0;
+	/**
+	 * Metric number of tasks executed at one iteration
+	 */
 	private static float metricNumber = 0;
 
 	public static void main(String[] args) {
@@ -114,6 +139,10 @@ public class JobshopScheduling {
 
 	}
 
+	/**
+	 * Function draw new tasks and decide, what program should do with drawn
+	 * tasks: generate plan for it or get plan from generated plans
+	 */
 	private static void jobshopScheduling() {
 		Random rand = new Random();
 		Map<Integer, List<Integer>> numOfJobsPerMachine = new LinkedHashMap<Integer, List<Integer>>();
@@ -165,6 +194,13 @@ public class JobshopScheduling {
 
 	}
 
+	/**
+	 * Search for best plan for drawn tasks
+	 * 
+	 * @param numOfJobsPerMachine
+	 *            tasks
+	 * @return best plan
+	 */
 	private static MachinesAndJobs getRandomMachines(
 			Map<Integer, List<Integer>> numOfJobsPerMachine) {
 		boolean bool = true;
@@ -232,6 +268,13 @@ public class JobshopScheduling {
 		return null;
 	}
 
+	/**
+	 * Search for identical tasks in generated plans and return plan if found
+	 * 
+	 * @param numOfJobsPerMachine
+	 *            tasks
+	 * @return plan
+	 */
 	private static MachinesAndJobs getMachine(
 			Map<Integer, List<Integer>> numOfJobsPerMachine) {
 		for (Map<Integer, List<Integer>> conf : generatedMachines.keySet())
@@ -241,12 +284,21 @@ public class JobshopScheduling {
 		return null;
 	}
 
+	/**
+	 * Check if tasks are identical
+	 * 
+	 * @param conf
+	 *            first configuration of tasks
+	 * @param conf2
+	 *            second configuration of tasks
+	 * @return true if equals
+	 */
 	private static boolean isEqualsConfs(Map<Integer, List<Integer>> conf,
-			Map<Integer, List<Integer>> numOfJobsPerMachine) {
+			Map<Integer, List<Integer>> conf2) {
 		int i = 0;
 		for (List<Integer> list : conf.values()) {
 			int j = 0;
-			List<Integer> list2 = numOfJobsPerMachine.get(i);
+			List<Integer> list2 = conf2.get(i);
 			if (list.size() != list2.size())
 				return false;
 			for (Integer it : list) {
@@ -260,6 +312,15 @@ public class JobshopScheduling {
 		return true;
 	}
 
+	/**
+	 * Generate one plan for one configuration of tasks
+	 * 
+	 * @param numOfJobsPerMachine
+	 *            tasks
+	 * @param shouldChangeLastJobId
+	 *            should or not
+	 * @return info about good conclusion
+	 */
 	private static boolean makeAllJob(
 			Map<Integer, List<Integer>> numOfJobsPerMachine,
 			boolean shouldChangeLastJobId) {
@@ -311,6 +372,13 @@ public class JobshopScheduling {
 		return result;
 	}
 
+	/**
+	 * Clear all used info about tasks on iteration end, save tasks that was not
+	 * executed
+	 * 
+	 * @param js
+	 *            list of jobs
+	 */
 	private static void clearJobs(List<Job> js) {
 		List<Job> searchInJobs;
 		if (js != null)
@@ -355,6 +423,9 @@ public class JobshopScheduling {
 		}
 	}
 
+	/**
+	 * Run thread which generate plans
+	 */
 	private static void runWorkers() {
 		setShouldWork(true);
 		Thread thread = new Thread(new Runnable() {
@@ -470,6 +541,9 @@ public class JobshopScheduling {
 			;
 	}
 
+	/**
+	 * Generate the most bigger plan
+	 */
 	protected static void generateTheMostBiggerPlan() {
 		ConcurrentHashMap<Integer, List<Integer>> numOfJobsPerMachine = new ConcurrentHashMap<Integer, List<Integer>>();
 
@@ -547,9 +621,21 @@ public class JobshopScheduling {
 		vars = new ArrayList<IntVar>();
 	}
 
+	/**
+	 * Machine
+	 */
 	static class Machine {
+		/**
+		 * Number
+		 */
 		int n;
+		/**
+		 * Tasks on machine
+		 */
 		ArrayList<Task> tasks = new ArrayList<Task>();
+		/**
+		 * Graphic representation of tasks
+		 */
 		Rectangles rect = new Rectangles();
 
 		public Machine(int n) {
@@ -594,6 +680,17 @@ public class JobshopScheduling {
 
 	}
 
+	/**
+	 * Check tasks for conclusions
+	 * 
+	 * @param startEnds
+	 *            table of starts and ends of tasks
+	 * @param start
+	 *            start of one task
+	 * @param end
+	 *            end of one task
+	 * @return true if conclusion exists
+	 */
 	public static boolean checkStartEnds(ArrayList<StartEnd> startEnds,
 			int start, int end) {
 		for (StartEnd startEnd : startEnds)
@@ -603,9 +700,18 @@ public class JobshopScheduling {
 		return true;
 	}
 
+	/**
+	 * Job
+	 */
 	public static class Job {
 
+		/**
+		 * List of tasks
+		 */
 		ArrayList<Task> tasks = new ArrayList<Task>();
+		/**
+		 * Id
+		 */
 		int id;
 
 		public Job(int job) {
@@ -636,12 +742,33 @@ public class JobshopScheduling {
 
 	}
 
+	/**
+	 * Task
+	 */
 	private static class Task {
+		/**
+		 * Start of task
+		 */
 		IntVar start;
+		/**
+		 * End of task
+		 */
 		IntVar end;
+		/**
+		 * Number
+		 */
 		int n;
+		/**
+		 * Machine
+		 */
 		Machine m;
+		/**
+		 * Job
+		 */
 		Job j;
+		/**
+		 * Duration
+		 */
 		int duration;
 
 		public Task(int duration, int n, Machine m, Job j) {
@@ -665,7 +792,13 @@ public class JobshopScheduling {
 		}
 	}
 
+	/**
+	 * Graphical representation of tasks
+	 */
 	static class Rectangles {
+		/**
+		 * Rectangles
+		 */
 		private ArrayList<IntVar[]> rectangles;
 
 		public Rectangles() {

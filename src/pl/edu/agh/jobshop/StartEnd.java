@@ -1,5 +1,8 @@
 package pl.edu.agh.jobshop;
 
+/**
+ * Helper class which represents start and end of one task on machine
+ */
 public class StartEnd {
 
 	private int start;
